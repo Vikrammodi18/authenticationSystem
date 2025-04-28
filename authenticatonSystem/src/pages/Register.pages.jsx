@@ -1,36 +1,42 @@
 
-
+import { useNavigate } from "react-router-dom"
 import {useState} from "react"
 
 const Register =  ()=>{
-        const [data,setData] = useState({})
+        const navigate = useNavigate()
         const[email,setEmail] = useState()
         const [password,setPassword] = useState()
         const [username,setUsername] = useState()
+        const[fetchResponse,setFetchResponse] = useState("")
         const fetchedData = async ()=>{
             const url = "http://localhost:3000/api/v1/users/register"
-    
+            console.log(email,password,username)
             const response = await fetch(url,{
+                
                 method:"POST",
                 headers:{"content-type":"application/json"},
                 credentials:"include",
                 body: JSON.stringify({
-                    email : data.email,
-                    password: data.password,
-                    username: data.username
+                    email : email,
+                    password: password,
+                    username: username
                 })
             })
             const responsedata = await response.json()
             console.log(responsedata)
             if(responsedata.success === true){
-                alert ("successfull login")
+                alert ("successfull registered")
             }else{
-                alert (`${responsedata.message}, ${responsedata.success}`)
+                setFetchResponse(responsedata.message)
+                if(responsedata.message === "user already existed"){
+                    navigate('/login')
+                }
+                
             }
             
         }
         const submitForm = async()=>{
-            setData({email,password,username})
+            
             fetchedData()
         }
        
@@ -57,6 +63,7 @@ const Register =  ()=>{
                         <label htmlFor="password">password:</label>
                         <input className="outline-none px-3 py-2" type="password" onChange={(e)=>{setPassword(e.target.value)}} name="" placeholder="enter password" id="password" />
                     </div>
+                    <p className="text-center text-red-800">{fetchResponse}</p>
                     <button onClick={()=>{submitForm()}} className="border-1 px-1 py-1 rounded-lg">register</button>
                     
                 </div>
