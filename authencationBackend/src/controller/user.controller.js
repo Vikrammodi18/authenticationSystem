@@ -4,6 +4,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require("../utils/apiResponse")
 
 const registerUser  = asyncHandler(async(req,res)=>{
+
     const {username,email,password} = req.body;
     
     if([username,email,password].some((val)=> !val || val.trim()==="")){
@@ -39,7 +40,35 @@ const registerUser  = asyncHandler(async(req,res)=>{
         }
     }
 })
-
+const loginUser = asyncHandler(async (req,res)=>{
+    let {email,password} = req.body
+    if([email,password].some((field)=> !field || field.trim()==="")){
+        throw new ApiError(400,"email or password are required")
+    }
+    email = email.trim()
+    password = password.trim()
+    const user = await User.findOne({email})
+    if(!user){
+        throw new ApiError(404,"user is not registered!")
+    }
+    
+    const checkPassword = await user.isPasswordCorrect(password)
+    
+    if(!checkPassword){
+        return res
+        .status(403)
+        .json(
+            new ApiResponse(403,"","password is wrong")
+        )
+    }else{
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200,user,"you are logged in")
+        )
+    }
+})
 module.exports = {
-    registerUser
+    registerUser,
+    loginUser
 }

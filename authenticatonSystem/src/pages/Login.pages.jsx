@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react"
 
 function Login(){
-    const [data,setData] = useState({})
+    const [isVerified,setIsVerified] = useState("")
     const[email,setEmail] = useState()
     const [password,setPassword] = useState()
     const fetchedData = async ()=>{
-        const url = "http://localhost:3000/api/v1/users/register"
+        const url = "http://localhost:3000/api/v1/users/login"
 
         const response = await fetch(url,{
             method:"POST",
             headers:{"content-type":"application/json"},
             credentials:"include",
             body: JSON.stringify({
-                email : data.email,
-                password: data.password
+                email : email,
+                password: password
             })
         })
         const responsedata = await response.json()
@@ -21,18 +21,16 @@ function Login(){
         if(responsedata.success === true){
             alert ("successfull login")
         }else{
-            alert (`${responsedata.message}, ${responsedata.success}`)
+            setIsVerified(responsedata.message)
+           
         }
         
     }
     const submitForm = async()=>{
-        setData({email,password})
+        
         fetchedData()
     }
-    useEffect(()=>{
-        
-        
-    },[])
+   
 
     return(
         <>
@@ -52,6 +50,7 @@ function Login(){
                     <label htmlFor="password">password:</label>
                     <input className="outline-none px-3 py-2" type="password" onChange={(e)=>{setPassword(e.target.value)}} name="" placeholder="enter password" id="password" />
                 </div>
+                <p className="text-center text-red-700">{isVerified}</p>
                 <button onClick={()=>{submitForm()}} className="border-1 px-1 py-1 rounded-lg">submit</button>
                 
             </div>

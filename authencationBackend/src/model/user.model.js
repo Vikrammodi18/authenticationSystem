@@ -1,5 +1,6 @@
 const {mongoose,Schema} = require("mongoose")
 const bcrypt = require("bcrypt")
+const ApiError = require("../utils/apiError")
 const userSchema = new Schema({
     username:{
         type:String,
@@ -28,7 +29,10 @@ userSchema.pre("save",async function(next){
     next()
 
 })
+userSchema.methods.isPasswordCorrect = async function(password){
 
+    return await bcrypt.compare(password,this.password);
+}
 const User = mongoose.model("User",userSchema)
 
 module.exports = User
